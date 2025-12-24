@@ -279,10 +279,10 @@ Content: ${content.substring(0, 1000)}`,
     }
   }
 
-  private async analyzeImage(url: string, slackClient: WebClient): Promise<string> {
+  private async analyzeImage(url: string, _slackClient: WebClient): Promise<string> {
     try {
       // Download image
-      const imageBuffer = await this.downloadSlackFile(url, slackClient);
+      const imageBuffer = await this.downloadSlackFile(url, _slackClient);
       const base64Image = imageBuffer.toString('base64');
 
       // Use Claude's vision capabilities

@@ -98,7 +98,7 @@ export class NotionService {
     return withRetry(async () => {
       logger.info('Updating investor in Notion', { pageId });
 
-      const properties: Record<string, unknown> = {};
+      const properties: any = {};
 
       if (lead.name) {
         properties.Name = { title: [{ text: { content: lead.name } }] };

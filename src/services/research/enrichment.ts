@@ -13,10 +13,10 @@ export class EnrichmentService {
     try {
       logger.info('Enriching investor from web', { investorName, website });
 
-      let url = website;
+      let url: string | undefined = website;
       if (!url) {
         // Try to find website via search
-        url = await this.findWebsite(investorName);
+        url = (await this.findWebsite(investorName)) || undefined;
       }
 
       if (!url) {

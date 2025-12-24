@@ -32,10 +32,29 @@ async function main() {
     const learningService = new LearningService(knowledgeBase);
     const fileProcessor = new FileProcessor();
 
-    // Validate Notion database connections
+    // Validate Notion database connections (optional in development)
     logger.info('Validating Notion database connection...');
-    await notionService.ensureDatabaseSchema();
-    await knowledgeBase.ensureKnowledgeDatabaseSchema();
+    try {
+      await notionService.ensureDatabaseSchema();
+      logger.info('✅ Main Notion database validated');
+    } catch (error) {
+      if (config.app.env === 'development') {
+        logger.warn('⚠️  Main Notion database validation failed - continuing in dev mode', { error });
+      } else {
+        throw error;
+      }
+    }
+
+    try {
+      await knowledgeBase.ensureKnowledgeDatabaseSchema();
+      logger.info('✅ Knowledge database validated');
+    } catch (error) {
+      if (config.app.env === 'development') {
+        logger.warn('⚠️  Knowledge database validation failed - continuing in dev mode', { error });
+      } else {
+        throw error;
+      }
+    }
 
     // Initialize handlers
     const messageHandler = new MessageHandler(aiAgent, notionService, enrichmentService);
