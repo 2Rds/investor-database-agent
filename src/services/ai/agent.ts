@@ -6,9 +6,18 @@ import { withRetry } from '../../utils/retry';
 
 export class AIAgent {
   private client: Anthropic;
+  private knowledgeContext: Map<string, string> = new Map();
 
   constructor() {
     this.client = new Anthropic({ apiKey: config.anthropic.apiKey });
+  }
+
+  setKnowledgeContext(userId: string, context: string): void {
+    this.knowledgeContext.set(userId, context);
+    logger.info('Updated knowledge context for user', {
+      userId,
+      contextLength: context.length,
+    });
   }
 
   async researchInvestor(investorName: string, context: string = ''): Promise<InvestorLead> {
@@ -103,12 +112,17 @@ Focus on accuracy and recent information. If you cannot find certain information
 
   async findMatchingInvestors(
     startupProfile: StartupProfile,
-    count: number = 10
+    count: number = 10,
+    userId?: string
   ): Promise<InvestorLead[]> {
     logger.info('Finding matching investors with AI', {
       startup: startupProfile.name,
       count,
+      hasKnowledgeContext: userId ? this.knowledgeContext.has(userId) : false,
     });
+
+    // Get knowledge context if available
+    const knowledgeContext = userId ? this.knowledgeContext.get(userId) : undefined;
 
     const prompt = `You are an expert at matching startups with ideal investors. Based on the following startup profile, identify ${count} highly relevant investors (VCs, family offices, or angels) that would be excellent matches.
 
@@ -121,6 +135,8 @@ ${startupProfile.fundingGoal ? `- Funding Goal: $${startupProfile.fundingGoal.to
 ${startupProfile.geography ? `- Geography: ${startupProfile.geography}` : ''}
 ${startupProfile.uniqueValueProp ? `- Unique Value Prop: ${startupProfile.uniqueValueProp}` : ''}
 ${startupProfile.targetInvestorTraits ? `- Desired Investor Traits: ${startupProfile.targetInvestorTraits.join(', ')}` : ''}
+
+${knowledgeContext ? `Additional Context from Knowledge Base:\n${knowledgeContext.substring(0, 3000)}\n` : ''}
 
 Please provide ${count} matching investors in valid JSON array format. For each investor, provide:
 [

@@ -106,3 +106,55 @@ export interface AgentConfig {
   enableWebScraping: boolean;
   enableExternalAPIs: boolean;
 }
+
+// Knowledge Base Types
+export interface KnowledgeItem {
+  id?: string;
+  type: 'file' | 'link' | 'text' | 'image' | 'video' | 'document';
+  title: string;
+  content?: string;
+  url?: string;
+  fileUrl?: string;
+  summary?: string;
+  extractedInfo?: Record<string, any>;
+  tags?: string[];
+  category?: string;
+  addedAt: Date;
+  lastUpdated?: Date;
+  source: 'user_upload' | 'slack_message' | 'conversation';
+  metadata?: {
+    fileName?: string;
+    fileSize?: number;
+    mimeType?: string;
+    slackFileId?: string;
+  };
+}
+
+export interface StartupKnowledgeBase {
+  userId: string;
+  startupProfile?: StartupProfile;
+  knowledgeItems: KnowledgeItem[];
+  conversationHistory: ConversationEntry[];
+  learnedInsights: string[];
+  lastUpdated: Date;
+}
+
+export interface ConversationEntry {
+  id: string;
+  timestamp: Date;
+  question: string;
+  answer: string;
+  extractedInfo?: Record<string, any>;
+}
+
+export interface LearningSession {
+  id: string;
+  userId: string;
+  channel: string;
+  threadTs: string;
+  status: 'active' | 'completed' | 'paused';
+  questionsAsked: number;
+  startedAt: Date;
+  completedAt?: Date;
+  insights: string[];
+}

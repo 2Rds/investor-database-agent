@@ -5,6 +5,9 @@ import { AIAgent } from './services/ai/agent';
 import { NotionService } from './services/notion/client';
 import { EnrichmentService } from './services/research/enrichment';
 import { Orchestrator } from './services/orchestrator';
+import { KnowledgeBaseService } from './services/knowledge/knowledgeBase';
+import { LearningService } from './services/knowledge/learningService';
+import { FileProcessor } from './services/knowledge/fileProcessor';
 import { MessageHandler } from './handlers/messageHandler';
 import { CommandHandler } from './handlers/commandHandler';
 
@@ -23,13 +26,26 @@ async function main() {
     const enrichmentService = new EnrichmentService();
     const orchestrator = new Orchestrator(aiAgent, notionService, enrichmentService);
 
-    // Validate Notion database connection
+    // Initialize knowledge base services
+    logger.info('Initializing knowledge base...');
+    const knowledgeBase = new KnowledgeBaseService();
+    const learningService = new LearningService(knowledgeBase);
+    const fileProcessor = new FileProcessor();
+
+    // Validate Notion database connections
     logger.info('Validating Notion database connection...');
     await notionService.ensureDatabaseSchema();
+    await knowledgeBase.ensureKnowledgeDatabaseSchema();
 
     // Initialize handlers
     const messageHandler = new MessageHandler(aiAgent, notionService, enrichmentService);
-    const commandHandler = new CommandHandler(notionService, aiAgent);
+    const commandHandler = new CommandHandler(
+      notionService,
+      aiAgent,
+      knowledgeBase,
+      learningService,
+      fileProcessor
+    );
 
     // Initialize Slack bot
     logger.info('Initializing Slack bot...');
@@ -41,6 +57,7 @@ async function main() {
     logger.info('✅ Investor Database Agent is running!', {
       maxConcurrentResearch: config.agent.maxConcurrentResearch,
       researchTimeout: config.agent.researchTimeoutMs,
+      knowledgeBaseEnabled: !!config.notion.knowledgeDatabaseId,
     });
 
     // Graceful shutdown

@@ -12,6 +12,7 @@ const envSchema = z.object({
   // Notion
   NOTION_API_KEY: z.string().min(1, 'NOTION_API_KEY is required'),
   NOTION_DATABASE_ID: z.string().min(1, 'NOTION_DATABASE_ID is required'),
+  NOTION_KNOWLEDGE_DATABASE_ID: z.string().optional(),
 
   // Anthropic
   ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
@@ -53,6 +54,7 @@ export const config = {
   notion: {
     apiKey: env.NOTION_API_KEY,
     databaseId: env.NOTION_DATABASE_ID,
+    knowledgeDatabaseId: env.NOTION_KNOWLEDGE_DATABASE_ID,
   },
   anthropic: {
     apiKey: env.ANTHROPIC_API_KEY,
