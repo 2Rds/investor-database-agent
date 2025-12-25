@@ -17,9 +17,13 @@ const envSchema = z.object({
   // Anthropic
   ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
 
-  // Optional APIs
+  // Optional Enrichment APIs
   CRUNCHBASE_API_KEY: z.string().optional(),
   PITCHBOOK_API_KEY: z.string().optional(),
+  APOLLO_API_KEY: z.string().optional(),
+  CLEARBIT_API_KEY: z.string().optional(),
+  GOOGLE_SEARCH_API_KEY: z.string().optional(),
+  GOOGLE_SEARCH_CX: z.string().optional(),
 
   // App Config
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -62,6 +66,10 @@ export const config = {
   externalApis: {
     crunchbase: env.CRUNCHBASE_API_KEY,
     pitchbook: env.PITCHBOOK_API_KEY,
+    apollo: env.APOLLO_API_KEY,
+    clearbit: env.CLEARBIT_API_KEY,
+    googleSearch: env.GOOGLE_SEARCH_API_KEY,
+    googleSearchCx: env.GOOGLE_SEARCH_CX,
   },
   app: {
     env: env.NODE_ENV,

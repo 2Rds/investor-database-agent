@@ -141,6 +141,15 @@ export class SlackBot {
       }
     });
 
+    this.app.command('/vc-bulk-enrich', async ({ command, ack, client }) => {
+      await ack();
+      try {
+        await this.commandHandler.handleBulkEnrich(command, client);
+      } catch (error) {
+        logger.error('Error handling /vc-bulk-enrich command', { error });
+      }
+    });
+
     // Interactive button clicks
     this.app.action('approve_investor', async ({ ack, body, client }) => {
       await ack();
@@ -238,6 +247,13 @@ I help you research and manage VC, family office, and angel investor leads direc
 
 🛑 \`/vc-learn-stop\`
    Stop the current learning session
+
+*Bulk Enrichment:*
+
+📊 \`/vc-bulk-enrich\`
+   Upload a CSV file (or paste CSV data) to enrich and import multiple investors
+   Perfect for enriching large spreadsheets (e.g., 3,000 investors)
+   Adds verified emails, company data, and recent activity to each investor
 
 *Other Commands:*
 

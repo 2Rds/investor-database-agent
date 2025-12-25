@@ -61,6 +61,7 @@ async function main() {
     const commandHandler = new CommandHandler(
       notionService,
       aiAgent,
+      enrichmentService,
       knowledgeBase,
       learningService,
       fileProcessor

@@ -4,6 +4,7 @@ import { AIAgent } from '../services/ai/agent';
 import { KnowledgeBaseService } from '../services/knowledge/knowledgeBase';
 import { LearningService } from '../services/knowledge/learningService';
 import { FileProcessor } from '../services/knowledge/fileProcessor';
+import { EnrichmentService } from '../services/research/enrichment';
 import { InvestorLead } from '../types';
 import { logger } from '../utils/logger';
 
@@ -11,6 +12,7 @@ export class CommandHandler {
   constructor(
     private notionService: NotionService,
     private aiAgent: AIAgent,
+    private enrichmentService?: EnrichmentService,
     private knowledgeBase?: KnowledgeBaseService,
     private learningService?: LearningService,
     private fileProcessor?: FileProcessor
@@ -425,5 +427,263 @@ Add information about your startup to help me provide better investor matches!
     } catch (error) {
       logger.error('Failed to stop learning session', { error, userId });
     }
+  }
+
+  async handleBulkEnrich(command: any, client: WebClient) {
+    if (!this.enrichmentService) {
+      await client.chat.postMessage({
+        channel: command.channel_id,
+        text: '❌ Enrichment service not available.',
+      });
+      return;
+    }
+
+    const userId = command.user_id;
+    const text = command.text.trim();
+
+    // Parse CSV data from command text or check for file upload
+    const files = command.files || [];
+
+    if (files.length === 0 && !text) {
+      await client.chat.postMessage({
+        channel: command.channel_id,
+        text: `📊 *Bulk Investor Enrichment*
+
+Upload a CSV file with your investor data, or paste CSV data.
+
+*Required columns:*
+- \`name\` - Investor/firm name (required)
+- \`email\` - Email address (optional)
+- \`firmName\` - Firm name if different from name (optional)
+- \`website\` - Website URL (optional)
+
+*Example CSV:*
+\`\`\`
+name,email,firmName,website
+Sequoia Capital,,,sequoiacap.com
+Marc Andreessen,marc@a16z.com,Andreessen Horowitz,a16z.com
+\`\`\`
+
+*Usage:*
+1. Upload a CSV file with the message
+2. Or use: \`/vc-bulk-enrich [paste CSV data]\`
+
+The agent will:
+✅ Find verified emails (Apollo.io)
+✅ Enrich company data (Crunchbase, Clearbit)
+✅ Check recent activity (last 6 months)
+✅ Add to your Notion database
+
+*Processing time:* ~10-15 seconds per investor
+*3,000 investors = ~8-12 hours* (runs in background)`,
+      });
+      return;
+    }
+
+    try {
+      let csvData = '';
+
+      // Check if file was uploaded
+      if (files.length > 0) {
+        const file = files[0];
+
+        // Download file from Slack
+        const response = await client.files.info({ file: file.id });
+        const fileInfo = response.file as any;
+
+        if (fileInfo.url_private) {
+          const axios = require('axios');
+          const fileResponse = await axios.get(fileInfo.url_private, {
+            headers: {
+              Authorization: `Bearer ${client.token}`,
+            },
+          });
+          csvData = fileResponse.data;
+        }
+      } else {
+        csvData = text;
+      }
+
+      // Parse CSV
+      const lines = csvData.trim().split('\n');
+      const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+
+      const nameIndex = headers.indexOf('name');
+      const emailIndex = headers.indexOf('email');
+      const firmIndex = headers.indexOf('firmname') >= 0 ? headers.indexOf('firmname') : headers.indexOf('firm');
+      const websiteIndex = headers.indexOf('website');
+
+      if (nameIndex === -1) {
+        await client.chat.postMessage({
+          channel: command.channel_id,
+          text: '❌ CSV must have a "name" column.',
+        });
+        return;
+      }
+
+      const investors = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values[nameIndex]) {
+          investors.push({
+            name: values[nameIndex],
+            email: emailIndex >= 0 ? values[emailIndex] : undefined,
+            firmName: firmIndex >= 0 ? values[firmIndex] : undefined,
+            website: websiteIndex >= 0 ? values[websiteIndex] : undefined,
+          });
+        }
+      }
+
+      if (investors.length === 0) {
+        await client.chat.postMessage({
+          channel: command.channel_id,
+          text: '❌ No investors found in CSV data.',
+        });
+        return;
+      }
+
+      await client.chat.postMessage({
+        channel: command.channel_id,
+        text: `🚀 Starting bulk enrichment for *${investors.length} investors*...
+
+This will run in the background. I'll update you with progress every 100 investors.
+
+*Estimated time:* ${Math.round(investors.length * 12 / 60)} minutes
+
+*Enrichment sources:*
+${this.getEnabledEnrichmentSources()}`,
+      });
+
+      logger.info('Starting bulk enrichment', { count: investors.length, userId });
+
+      // Process in background
+      this.processBulkEnrichment(investors, command.channel_id, client).catch(error => {
+        logger.error('Bulk enrichment failed', { error, count: investors.length });
+      });
+
+    } catch (error) {
+      logger.error('Failed to parse CSV for bulk enrichment', { error, userId });
+      await client.chat.postMessage({
+        channel: command.channel_id,
+        text: '❌ Failed to parse CSV data. Please check the format and try again.',
+      });
+    }
+  }
+
+  private async processBulkEnrichment(
+    investors: Array<{ name: string; email?: string; firmName?: string; website?: string }>,
+    channelId: string,
+    client: WebClient
+  ) {
+    if (!this.enrichmentService) return;
+
+    const batchSize = 100;
+    let processed = 0;
+    let enriched = 0;
+    let added = 0;
+
+    for (let i = 0; i < investors.length; i += batchSize) {
+      const batch = investors.slice(i, i + batchSize);
+
+      try {
+        const enrichedBatch = await this.enrichmentService.bulkEnrich(batch);
+
+        // Add enriched investors to Notion
+        for (const enrichedInvestor of enrichedBatch) {
+          try {
+            if (enrichedInvestor.email || enrichedInvestor.website) {
+              const lead: InvestorLead = {
+                name: enrichedInvestor.name || enrichedInvestor.originalName,
+                email: enrichedInvestor.email || '',
+                type: (enrichedInvestor.type || 'vc') as 'vc' | 'family_office' | 'angel',
+                firmName: enrichedInvestor.firmName,
+                investmentThesis: enrichedInvestor.investmentThesis || 'Pending enrichment',
+                recentInvestments: [],
+                industries: enrichedInvestor.industries || [],
+                stages: enrichedInvestor.stages || [],
+                geography: enrichedInvestor.geography || [],
+                checkSize: enrichedInvestor.checkSize,
+                website: enrichedInvestor.website,
+                linkedIn: enrichedInvestor.linkedIn,
+                matchScore: 0,
+                matchReason: 'Bulk imported and enriched',
+                lastUpdated: new Date(),
+                source: 'bulk_enrichment',
+                notes: enrichedInvestor.notes,
+              };
+
+              await this.notionService.addInvestor(lead);
+              added++;
+            }
+            enriched++;
+          } catch (error) {
+            logger.error('Failed to add enriched investor', {
+              error,
+              investor: enrichedInvestor.name
+            });
+          }
+        }
+
+        processed += batch.length;
+
+        // Progress update every batch
+        await client.chat.postMessage({
+          channel: channelId,
+          text: `📊 Progress: ${processed}/${investors.length} investors processed\n✅ ${enriched} enriched | 💾 ${added} added to database`,
+        });
+
+        logger.info('Bulk enrichment progress', {
+          processed,
+          total: investors.length,
+          enriched,
+          added
+        });
+
+      } catch (error) {
+        logger.error('Batch enrichment failed', { error, batchStart: i });
+      }
+    }
+
+    // Final summary
+    await client.chat.postMessage({
+      channel: channelId,
+      text: `🎉 *Bulk enrichment complete!*
+
+📊 *Results:*
+• Total processed: ${processed}
+• Successfully enriched: ${enriched}
+• Added to database: ${added}
+• Failed: ${processed - enriched}
+
+*Enrichment rate:* ${Math.round((enriched / processed) * 100)}%
+
+Your investor database is ready! Use \`/vc-list all\` to view your enriched investors.`,
+    });
+
+    logger.info('Bulk enrichment completed', {
+      total: investors.length,
+      processed,
+      enriched,
+      added,
+    });
+  }
+
+  private getEnabledEnrichmentSources(): string {
+    const sources = [];
+    const config = require('../config').config;
+
+    if (config.externalApis.apollo) sources.push('✅ Apollo.io (contact emails)');
+    else sources.push('⚠️  Apollo.io (not configured)');
+
+    if (config.externalApis.clearbit) sources.push('✅ Clearbit (company data)');
+    else sources.push('⚠️  Clearbit (not configured)');
+
+    if (config.externalApis.crunchbase) sources.push('✅ Crunchbase (investor profiles)');
+    else sources.push('⚠️  Crunchbase (not configured)');
+
+    if (config.externalApis.googleSearch) sources.push('✅ Google Search (recent activity)');
+    else sources.push('⚠️  Google Search (not configured)');
+
+    return sources.join('\n');
   }
 }

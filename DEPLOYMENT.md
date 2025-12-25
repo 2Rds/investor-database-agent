@@ -113,7 +113,27 @@ Once deployed, test these commands in your Slack workspace:
 @InvestorAgent find seed stage B2B SaaS investors
 ```
 
-### 5. Database Management
+### 5. Bulk Enrichment (For your 3,000 investor spreadsheet!)
+```
+/vc-bulk-enrich                 # Upload CSV file or paste CSV data
+```
+
+**CSV format:**
+```csv
+name,email,firmName,website
+Sequoia Capital,,,sequoiacap.com
+Marc Andreessen,marc@a16z.com,Andreessen Horowitz,a16z.com
+```
+
+The agent will:
+- ✅ Find verified emails (Apollo.io)
+- ✅ Enrich company data (Crunchbase, Clearbit)
+- ✅ Check recent activity (Google Search - last 6 months)
+- ✅ Add everything to Notion database
+
+**Processing time:** ~10-15 seconds per investor (8-12 hours for 3,000)
+
+### 6. Database Management
 ```
 /vc-add Investor Name, VC, firm@email.com
 /vc-list all
@@ -171,12 +191,27 @@ NOTION_DATABASE_ID=*            # Main investor database
 ### Optional Environment Variables
 ```env
 NOTION_KNOWLEDGE_DATABASE_ID=*   # For persistent knowledge storage
-CRUNCHBASE_API_KEY=*            # Enhanced investor data
-PITCHBOOK_API_KEY=*             # Enhanced investor data
+
+# Enrichment APIs (highly recommended for bulk enrichment)
+CRUNCHBASE_API_KEY=*            # Investor profiles, funding data (~$29-99/month)
+PITCHBOOK_API_KEY=*             # PE/VC market data (~$20k+/year - enterprise)
+APOLLO_API_KEY=*                # Contact enrichment, verified emails (~$49-149/month)
+CLEARBIT_API_KEY=*              # Company enrichment from domain (~$99/month)
+GOOGLE_SEARCH_API_KEY=*         # Website discovery, recent activity (~$5-10/month)
+GOOGLE_SEARCH_CX=*              # Google Custom Search Engine ID (free to create)
+
+# Performance tuning
 MAX_CONCURRENT_RESEARCH=3       # Parallel research tasks
 RESEARCH_TIMEOUT_MS=300000      # 5 minutes per task
 LOG_LEVEL=info                  # debug, info, warn, error
 ```
+
+**Recommended enrichment setup for bulk operations (3,000 investors):**
+- ✅ **Apollo.io** ($49/month) - Get verified emails
+- ✅ **Crunchbase** ($29-99/month) - Investor profiles and recent investments
+- ✅ **Google Custom Search** ($5-10/month) - Recent activity tracking
+- ✅ **Clearbit** (pay-per-use) - Company enrichment
+- **Total cost**: ~$100-200/month for comprehensive enrichment
 
 ## 📊 Notion Database Schemas
 
