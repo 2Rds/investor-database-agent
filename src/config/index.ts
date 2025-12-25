@@ -25,6 +25,7 @@ const envSchema = z.object({
   ZOOMINFO_API_KEY: z.string().optional(),
   GOOGLE_SEARCH_API_KEY: z.string().optional(),
   GOOGLE_SEARCH_CX: z.string().optional(),
+  FIRECRAWL_API_KEY: z.string().optional(),
 
   // App Config
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -72,6 +73,7 @@ export const config = {
     zoominfo: env.ZOOMINFO_API_KEY,
     googleSearch: env.GOOGLE_SEARCH_API_KEY,
     googleSearchCx: env.GOOGLE_SEARCH_CX,
+    firecrawl: env.FIRECRAWL_API_KEY,
   },
   app: {
     env: env.NODE_ENV,
