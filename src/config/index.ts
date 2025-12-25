@@ -22,6 +22,7 @@ const envSchema = z.object({
   PITCHBOOK_API_KEY: z.string().optional(),
   APOLLO_API_KEY: z.string().optional(),
   CLEARBIT_API_KEY: z.string().optional(),
+  ZOOMINFO_API_KEY: z.string().optional(),
   GOOGLE_SEARCH_API_KEY: z.string().optional(),
   GOOGLE_SEARCH_CX: z.string().optional(),
 
@@ -68,6 +69,7 @@ export const config = {
     pitchbook: env.PITCHBOOK_API_KEY,
     apollo: env.APOLLO_API_KEY,
     clearbit: env.CLEARBIT_API_KEY,
+    zoominfo: env.ZOOMINFO_API_KEY,
     googleSearch: env.GOOGLE_SEARCH_API_KEY,
     googleSearchCx: env.GOOGLE_SEARCH_CX,
   },

@@ -364,6 +364,90 @@ export class EnrichmentService {
     }
   }
 
+  async enrichFromZoomInfo(name: string, company?: string): Promise<EnrichmentResult> {
+    if (!config.externalApis.zoominfo) {
+      return {
+        success: false,
+        source: 'zoominfo',
+        error: 'ZoomInfo API key not configured',
+      };
+    }
+
+    try {
+      logger.info('Enriching contact from ZoomInfo', { name, company });
+
+      // ZoomInfo Person Search API
+      const response = await withRetry(async () => {
+        return axios.post(
+          'https://api.zoominfo.com/search/person',
+          {
+            personName: name,
+            companyName: company,
+            jobTitle: ['Partner', 'Managing Partner', 'General Partner', 'Venture Partner'],
+            jobFunction: ['Venture Capital', 'Investment', 'Private Equity'],
+            outputFields: [
+              'id',
+              'firstName',
+              'lastName',
+              'email',
+              'directPhoneNumber',
+              'mobilePhoneNumber',
+              'companyName',
+              'title',
+              'linkedInUrl',
+              'companyWebsite'
+            ]
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${config.externalApis.zoominfo}`,
+            },
+            timeout: 15000,
+          }
+        );
+      });
+
+      const person = response.data?.data?.[0];
+
+      if (!person) {
+        return {
+          success: false,
+          source: 'zoominfo',
+          error: 'No match found',
+        };
+      }
+
+      const enrichedData: Partial<InvestorLead> = {
+        email: person.email,
+        linkedIn: person.linkedInUrl,
+        firmName: person.companyName,
+        website: person.companyWebsite,
+        phone: person.directPhoneNumber || person.mobilePhoneNumber,
+      };
+
+      logger.info('Successfully enriched from ZoomInfo', {
+        name,
+        hasEmail: !!person.email,
+        hasPhone: !!(person.directPhoneNumber || person.mobilePhoneNumber),
+        hasLinkedIn: !!person.linkedInUrl,
+      });
+
+      return {
+        success: true,
+        data: enrichedData,
+        source: 'zoominfo',
+      };
+    } catch (error) {
+      logger.error('ZoomInfo enrichment failed', { error, name });
+      return {
+        success: false,
+        source: 'zoominfo',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
   async getRecentActivity(investorName: string, domain?: string): Promise<EnrichmentResult> {
     if (!config.externalApis.googleSearch || !config.externalApis.googleSearchCx) {
       return {
@@ -434,7 +518,16 @@ export class EnrichmentService {
 
         const enrichmentResults: EnrichmentResult[] = [];
 
-        // 1. Try Apollo (if we have name/domain)
+        // 1. Try ZoomInfo first (best for B2B contacts)
+        if (investor.name) {
+          const zoominfoResult = await this.enrichFromZoomInfo(
+            investor.name,
+            investor.firmName || undefined
+          );
+          enrichmentResults.push(zoominfoResult);
+        }
+
+        // 2. Try Apollo (if we have name/domain and ZoomInfo didn't find email)
         if (investor.name) {
           const apolloResult = await this.enrichFromApollo(
             investor.name,
@@ -444,20 +537,20 @@ export class EnrichmentService {
           enrichmentResults.push(apolloResult);
         }
 
-        // 2. Try Clearbit (if we have domain/website)
+        // 3. Try Clearbit (if we have domain/website)
         const domain = investor.website?.replace(/^https?:\/\//, '').replace(/\/$/, '');
         if (domain) {
           const clearbitResult = await this.enrichFromClearbit(domain);
           enrichmentResults.push(clearbitResult);
         }
 
-        // 3. Try Crunchbase (if we have firm name)
+        // 4. Try Crunchbase (if we have firm name)
         if (investor.firmName) {
           const crunchbaseResult = await this.enrichFromCrunchbase(investor.firmName);
           enrichmentResults.push(crunchbaseResult);
         }
 
-        // 4. Get recent activity
+        // 5. Get recent activity
         const activityResult = await this.getRecentActivity(
           investor.firmName || investor.name,
           domain
