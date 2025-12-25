@@ -72,6 +72,19 @@ export class NotionService {
         };
       }
 
+      // Match % (0-100 percentage)
+      if (lead.matchScore !== undefined) {
+        properties['Match %'] = {
+          number: lead.matchScore,
+        };
+      }
+
+      // Enriched checkbox - mark as checked if we have email or website
+      const isEnriched = !!(lead.email || lead.website || lead.linkedIn);
+      properties['Enriched'] = {
+        checkbox: isEnriched,
+      };
+
       const response = await this.client.pages.create({
         parent: { database_id: this.databaseId },
         properties,
@@ -208,6 +221,34 @@ export class NotionService {
       });
 
       logger.info('Successfully added warm contact', { pageId });
+    });
+  }
+
+  /**
+   * Mark an investor as enriched
+   */
+  async markAsEnriched(pageId: string, matchScore?: number): Promise<void> {
+    return withRetry(async () => {
+      logger.info('Marking investor as enriched', { pageId, matchScore });
+
+      const properties: any = {
+        'Enriched': {
+          checkbox: true,
+        },
+      };
+
+      if (matchScore !== undefined) {
+        properties['Match %'] = {
+          number: matchScore,
+        };
+      }
+
+      await this.client.pages.update({
+        page_id: pageId,
+        properties,
+      });
+
+      logger.info('Successfully marked investor as enriched', { pageId });
     });
   }
 
