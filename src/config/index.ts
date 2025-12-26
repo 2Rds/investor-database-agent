@@ -12,13 +12,20 @@ const envSchema = z.object({
   // Notion
   NOTION_API_KEY: z.string().min(1, 'NOTION_API_KEY is required'),
   NOTION_DATABASE_ID: z.string().min(1, 'NOTION_DATABASE_ID is required'),
+  NOTION_KNOWLEDGE_DATABASE_ID: z.string().optional(),
 
   // Anthropic
   ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
 
-  // Optional APIs
+  // Optional Enrichment APIs
   CRUNCHBASE_API_KEY: z.string().optional(),
   PITCHBOOK_API_KEY: z.string().optional(),
+  APOLLO_API_KEY: z.string().optional(),
+  CLEARBIT_API_KEY: z.string().optional(),
+  ZOOMINFO_API_KEY: z.string().optional(),
+  GOOGLE_SEARCH_API_KEY: z.string().optional(),
+  GOOGLE_SEARCH_CX: z.string().optional(),
+  FIRECRAWL_API_KEY: z.string().optional(),
 
   // App Config
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -53,6 +60,7 @@ export const config = {
   notion: {
     apiKey: env.NOTION_API_KEY,
     databaseId: env.NOTION_DATABASE_ID,
+    knowledgeDatabaseId: env.NOTION_KNOWLEDGE_DATABASE_ID,
   },
   anthropic: {
     apiKey: env.ANTHROPIC_API_KEY,
@@ -60,6 +68,12 @@ export const config = {
   externalApis: {
     crunchbase: env.CRUNCHBASE_API_KEY,
     pitchbook: env.PITCHBOOK_API_KEY,
+    apollo: env.APOLLO_API_KEY,
+    clearbit: env.CLEARBIT_API_KEY,
+    zoominfo: env.ZOOMINFO_API_KEY,
+    googleSearch: env.GOOGLE_SEARCH_API_KEY,
+    googleSearchCx: env.GOOGLE_SEARCH_CX,
+    firecrawl: env.FIRECRAWL_API_KEY,
   },
   app: {
     env: env.NODE_ENV,

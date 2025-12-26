@@ -103,6 +103,53 @@ export class SlackBot {
       await this.sendHelpMessage(say, command.channel_id);
     });
 
+    // Knowledge Base commands
+    this.app.command('/vc-knowledge', async ({ command, ack, client }) => {
+      await ack();
+      try {
+        await this.commandHandler.handleKnowledge(command, client);
+      } catch (error) {
+        logger.error('Error handling /vc-knowledge command', { error });
+      }
+    });
+
+    this.app.command('/vc-knowledge-summary', async ({ command, ack, client }) => {
+      await ack();
+      try {
+        await this.commandHandler.handleKnowledgeSummary(command, client);
+      } catch (error) {
+        logger.error('Error handling /vc-knowledge-summary command', { error });
+      }
+    });
+
+    // Learning commands
+    this.app.command('/vc-learn', async ({ command, ack, client }) => {
+      await ack();
+      try {
+        await this.commandHandler.handleLearn(command, client);
+      } catch (error) {
+        logger.error('Error handling /vc-learn command', { error });
+      }
+    });
+
+    this.app.command('/vc-learn-stop', async ({ command, ack, client }) => {
+      await ack();
+      try {
+        await this.commandHandler.handleLearnStop(command, client);
+      } catch (error) {
+        logger.error('Error handling /vc-learn-stop command', { error });
+      }
+    });
+
+    this.app.command('/vc-bulk-enrich', async ({ command, ack, client }) => {
+      await ack();
+      try {
+        await this.commandHandler.handleBulkEnrich(command, client);
+      } catch (error) {
+        logger.error('Error handling /vc-bulk-enrich command', { error });
+      }
+    });
+
     // Interactive button clicks
     this.app.action('approve_investor', async ({ ack, body, client }) => {
       await ack();
@@ -174,7 +221,7 @@ export class SlackBot {
 
 I help you research and manage VC, family office, and angel investor leads directly in Slack!
 
-*Commands:*
+*Investor Research Commands:*
 
 📌 \`@InvestorAgent add [investor name]\`
    Research and add a specific investor to your database
@@ -182,20 +229,47 @@ I help you research and manage VC, family office, and angel investor leads direc
 🔍 \`@InvestorAgent find investors for [description]\`
    Find matching investors based on your startup profile
 
-👤 \`@InvestorAgent set profile\`
-   Set or update your startup profile for better matching
-
 📊 \`@InvestorAgent list investors\`
    View all investors in your database
 
-❓ \`@InvestorAgent help\`
+*Knowledge Base Commands:*
+
+📚 \`/vc-knowledge [link or text]\`
+   Add information about your startup (links, files, text, images, videos)
+
+📖 \`/vc-knowledge-summary\`
+   View what I know about your startup
+
+*Learning Commands:*
+
+🎓 \`/vc-learn\`
+   Start an interactive Q&A session where I ask you questions about your startup
+
+🛑 \`/vc-learn-stop\`
+   Stop the current learning session
+
+*Bulk Enrichment:*
+
+📊 \`/vc-bulk-enrich\`
+   Upload a CSV file (or paste CSV data) to enrich and import multiple investors
+   Perfect for enriching large spreadsheets (e.g., 3,000 investors)
+   Adds verified emails, company data, and recent activity to each investor
+
+*Other Commands:*
+
+👤 \`@InvestorAgent set profile\`
+   Set or update your startup profile
+
+❓ \`@InvestorAgent help\` or \`/vc-help\`
    Show this help message
 
 *Examples:*
 
 • \`@InvestorAgent add Sequoia Capital\`
 • \`@InvestorAgent find investors for SaaS startup at seed stage\`
-• \`@InvestorAgent add a16z\`
+• \`/vc-knowledge https://yourcompany.com\`
+• \`/vc-knowledge We hit $100k MRR last month\`
+• \`/vc-learn\` (starts interactive learning)
 
 *Natural Language:*
 You can also just talk to me naturally! Try:
@@ -204,6 +278,7 @@ You can also just talk to me naturally! Try:
 • "What investors in my database match my startup?"
 
 I'll automatically research investors, enrich their data, and add them to your Notion database with notifications when tasks complete.
+The more I know about your startup (via /vc-knowledge and /vc-learn), the better I can match you with investors!
     `;
 
     await say({
