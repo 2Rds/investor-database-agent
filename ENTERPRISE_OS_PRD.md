@@ -61,7 +61,7 @@ We are building the world's first **full-stack hybrid Web2/Web3 Enterprise AI Op
 - 90% gross margins via Filebase arbitrage
 
 **Competitive Moats:**
-- Patent-pending Programmed Incompleteness
+- Patent Potential for Programmed Incompleteness IP
 - Legal compliance shield (GDPR, HIPAA, SOC 2)
 - No existing solution scores >5/10 similarity
 
