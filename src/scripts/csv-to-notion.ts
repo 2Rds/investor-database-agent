@@ -314,8 +314,8 @@ class CSVToNotionScorer {
       console.log('💾 Populating Notion database with qualified investors (C-Tier and above)...\n');
       console.log(`📋 Filtering out ${tierCounts['Not a Match']} "Not a Match" investors\n`);
 
-      // Filter to only include C-Tier and above (25%+)
-      const qualifiedInvestors = scoredInvestors.filter(({ score }) => score.percentageMatch >= 25);
+      // Filter to only include C-Tier and above (60%+)
+      const qualifiedInvestors = scoredInvestors.filter(({ score }) => score.percentageMatch >= 60);
 
       let added = 0;
       let failed = 0;
@@ -341,9 +341,9 @@ class CSVToNotionScorer {
       console.log('\n' + '='.repeat(60));
       console.log('\n✅ Scoring Complete!\n');
       console.log(`Total Investors Scored: ${investors.length}`);
-      console.log(`Qualified Investors (≥25% match): ${qualifiedInvestors.length}`);
+      console.log(`Qualified Investors (≥60% match): ${qualifiedInvestors.length}`);
       console.log(`Successfully Added to Notion: ${added}`);
-      console.log(`Filtered Out (<25% match): ${tierCounts['Not a Match']}`);
+      console.log(`Filtered Out (<60% match): ${tierCounts['Not a Match']}`);
       console.log(`Failed: ${failed}`);
       console.log('\n' + '='.repeat(60) + '\n');
 
@@ -361,9 +361,10 @@ class CSVToNotionScorer {
         console.log('');
       });
 
-      console.log('🎉 All investors have been scored and added to your new Notion database!');
+      console.log('🎉 All qualified investors (≥60% match) have been added to your Notion database!');
       console.log(`🔗 View at: https://notion.so/${databaseId.replace(/-/g, '')}\n`);
-      console.log('📌 Filter by "Tier = S-Tier" to see your top priority targets!\n');
+      console.log('📌 All investors are viable candidates (C-Tier+)');
+      console.log('📌 Filter by "Tier = S-Tier" or "A-Tier" to see your highest priority targets!\n');
 
       // Save database ID to file for future reference
       fs.writeFileSync(

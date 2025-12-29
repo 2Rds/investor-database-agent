@@ -47,11 +47,11 @@ export interface CSVInvestorRow {
  * - Recent Activity (10 pts): Recent deals/active portfolio (if data available)
  *
  * Tier Definitions:
- * - S-Tier: 90-100% - Perfect fit, priority outreach
- * - A-Tier: 75-89% - Strong fit, second wave outreach
- * - B-Tier: 60-74% - Good fit, consider for broader campaign
- * - C-Tier: 40-59% - Marginal fit, low priority
- * - Not a Match: <40% - Skip
+ * - S-Tier: 90-100% - Perfect fit, immediate priority outreach
+ * - A-Tier: 80-89% - Strong fit, high priority outreach
+ * - B-Tier: 70-79% - Good fit, solid candidate for outreach
+ * - C-Tier: 60-69% - Viable fit, consider for broader campaign
+ * - Not a Match: <60% - Not viable, skip
  */
 export class BlockDriveScorer {
   // Web3/Blockchain keywords (30 points max)
@@ -322,9 +322,9 @@ export class BlockDriveScorer {
 
   private determineTier(percentageMatch: number): BlockDriveMatchScore['tier'] {
     if (percentageMatch >= 90) return 'S-Tier';
-    if (percentageMatch >= 75) return 'A-Tier';
-    if (percentageMatch >= 60) return 'B-Tier';
-    if (percentageMatch >= 40) return 'C-Tier';
+    if (percentageMatch >= 80) return 'A-Tier';
+    if (percentageMatch >= 70) return 'B-Tier';
+    if (percentageMatch >= 60) return 'C-Tier';
     return 'Not a Match';
   }
 
