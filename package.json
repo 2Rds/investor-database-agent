@@ -13,7 +13,8 @@
     "analyze-csv": "tsx src/scripts/analyze-csv.ts",
     "enrich-top-matches": "tsx src/scripts/enrich-top-matches.ts",
     "score-notion": "tsx src/scripts/score-notion-investors.ts",
-    "sheets-to-notion": "tsx src/scripts/google-sheets-to-notion.ts"
+    "sheets-to-notion": "tsx src/scripts/google-sheets-to-notion.ts",
+    "csv-to-notion": "tsx src/scripts/csv-to-notion.ts"
   },
   "keywords": [
     "slack",
