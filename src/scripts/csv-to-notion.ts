@@ -310,20 +310,24 @@ class CSVToNotionScorer {
       // Step 3: Create fresh Notion database
       const databaseId = await this.createNotionDatabase();
 
-      // Step 4: Populate Notion database with scored investors
-      console.log('💾 Populating Notion database with scored investors...\n');
+      // Step 4: Filter out "Not a Match" investors and populate Notion database
+      console.log('💾 Populating Notion database with qualified investors (C-Tier and above)...\n');
+      console.log(`📋 Filtering out ${tierCounts['Not a Match']} "Not a Match" investors\n`);
+
+      // Filter to only include C-Tier and above (25%+)
+      const qualifiedInvestors = scoredInvestors.filter(({ score }) => score.percentageMatch >= 25);
 
       let added = 0;
       let failed = 0;
 
-      for (const { investor, score } of scoredInvestors) {
+      for (const { investor, score } of qualifiedInvestors) {
         try {
           await this.addInvestorToNotion(databaseId, investor, score);
           added++;
 
           // Log progress every 50 investors
           if (added % 50 === 0) {
-            console.log(`  ✅ Added ${added}/${investors.length} investors...`);
+            console.log(`  ✅ Added ${added}/${qualifiedInvestors.length} investors...`);
           }
 
           // Rate limiting: 3 requests per second (Notion API limit)
@@ -336,8 +340,10 @@ class CSVToNotionScorer {
 
       console.log('\n' + '='.repeat(60));
       console.log('\n✅ Scoring Complete!\n');
-      console.log(`Total Investors: ${investors.length}`);
-      console.log(`Successfully Added: ${added}`);
+      console.log(`Total Investors Scored: ${investors.length}`);
+      console.log(`Qualified Investors (≥25% match): ${qualifiedInvestors.length}`);
+      console.log(`Successfully Added to Notion: ${added}`);
+      console.log(`Filtered Out (<25% match): ${tierCounts['Not a Match']}`);
       console.log(`Failed: ${failed}`);
       console.log('\n' + '='.repeat(60) + '\n');
 
