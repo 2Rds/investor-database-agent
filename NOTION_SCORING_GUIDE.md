@@ -9,7 +9,7 @@ This script connects to your Notion VC lead database and applies the BlockDrive-
 1. **Fetches** all investors from your Notion database (with pagination support)
 2. **Scores** each investor using the BlockDrive algorithm (100-point system)
 3. **Updates** Notion with:
-   - Match % (0-100)
+   - # Match (0-100 score)
    - Match Tier (S-Tier, A-Tier, B-Tier, C-Tier, Not a Match)
    - Match Details (detailed breakdown of scoring)
    - Enriched checkbox (marked as true)
@@ -28,7 +28,7 @@ Your Notion database needs these properties:
 - ✅ **Portfolio** (URL) - Website/portfolio URL
 - ✅ **Firm LinkedIn** (URL) - LinkedIn profile
 - ✅ **Average Check Size** (Number) - Average investment size
-- ✅ **Match %** (Number) - Match score percentage
+- ✅ **# Match** (Number) - Match score percentage
 - ✅ **Enriched** (Checkbox) - Whether data is enriched
 
 #### New Properties to Add:
@@ -134,7 +134,7 @@ Failed: 0
 ...
 
 🎉 All match scores have been updated in your Notion database!
-📌 Check the "Match %", "Match Tier", and "Match Details" columns
+📌 Check the "# Match", "Match Tier", and "Match Details" columns
 ```
 
 ## 📊 Match Scoring Algorithm
@@ -179,7 +179,7 @@ Failed: 0
 
 **Firm Name:** Bedrock Capital
 
-**Match %:** 100
+**# Match:** 100
 
 **Match Tier:** S-Tier
 
@@ -204,9 +204,9 @@ Breakdown:
    - In Notion, filter by `Match Tier = S-Tier`
    - These are your top priority targets (90-100% match)
 
-2. **Sort by Match %**
+2. **Sort by # Match**
    - Sort descending to see best matches first
-   - Focus on 75%+ for initial outreach
+   - Focus on 75+ for initial outreach
 
 3. **Review Match Details**
    - Read the detailed breakdown for each top match

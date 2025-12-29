@@ -141,7 +141,7 @@ class NotionScorer {
       await this.client.pages.update({
         page_id: pageId,
         properties: {
-          'Match %': {
+          '# Match': {
             number: score.percentageMatch,
           },
           'Match Tier': {

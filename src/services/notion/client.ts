@@ -72,9 +72,9 @@ export class NotionService {
         };
       }
 
-      // Match % (0-100 percentage)
+      // # Match (0-100 percentage)
       if (lead.matchScore !== undefined) {
-        properties['Match %'] = {
+        properties['# Match'] = {
           number: lead.matchScore,
         };
       }
@@ -238,7 +238,7 @@ export class NotionService {
       };
 
       if (matchScore !== undefined) {
-        properties['Match %'] = {
+        properties['# Match'] = {
           number: matchScore,
         };
       }
