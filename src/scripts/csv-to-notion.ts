@@ -249,6 +249,31 @@ class CSVToNotionScorer {
       };
     }
 
+    if (investor.stage) {
+      // Parse stage data and convert to multi_select format
+      const stages: string[] = [];
+      const stageText = investor.stage.toLowerCase();
+
+      if (stageText.includes('pre-seed') || stageText.includes('pre seed')) {
+        stages.push('Pre-Seed');
+      }
+      if (stageText.includes('seed') && !stageText.includes('pre')) {
+        stages.push('Seed');
+      }
+      if (stageText.includes('series a') || stageText.includes('a round')) {
+        stages.push('Series A');
+      }
+      if (stageText.includes('series b') || stageText.includes('b round')) {
+        stages.push('Series B+');
+      }
+
+      if (stages.length > 0) {
+        properties['Stage'] = {
+          multi_select: stages.map(stage => ({ name: stage })),
+        };
+      }
+    }
+
     if (investor.avgCheckSize) {
       properties['Check Size'] = {
         rich_text: [{ text: { content: investor.avgCheckSize } }],
