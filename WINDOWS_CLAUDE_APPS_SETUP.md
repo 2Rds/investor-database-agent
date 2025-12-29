@@ -4,7 +4,7 @@
 
 Your project is located at:
 ```
-C:\Users\Sean Weiss\Documents\Claude Apps\investor-database-agent
+C:\Users\Sean Weiss\Documents\Claude-Apps\investor-database-agent
 ```
 
 ## Quick Start - Run the Notion Scoring Script
@@ -16,7 +16,7 @@ Right-click the Start menu → Select "Windows PowerShell"
 ### Step 2: Navigate to Your Project
 
 ```powershell
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 ```
 
 ### Step 3: Verify You're in the Right Place
@@ -25,7 +25,7 @@ cd "$HOME\Documents\Claude Apps\investor-database-agent"
 # Check current directory
 pwd
 
-# Should show: C:\Users\Sean Weiss\Documents\Claude Apps\investor-database-agent
+# Should show: C:\Users\Sean Weiss\Documents\Claude-Apps\investor-database-agent
 
 # List files to confirm
 ls
@@ -127,7 +127,7 @@ Failed: 0
 ### Navigate to Project Anytime
 
 ```powershell
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 ```
 
 ### Run the Scoring Script
@@ -139,7 +139,7 @@ npm run score-notion
 ### Pull Latest Updates from GitHub
 
 ```powershell
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 git pull origin claude/vc-lead-research-agent-QSDuJ
 npm install
 ```
@@ -165,7 +165,7 @@ Save this as `Score-Notion.ps1` on your Desktop:
 
 ```powershell
 # Score Notion Investors
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 npm run score-notion
 Read-Host "Press Enter to close"
 ```
@@ -178,7 +178,7 @@ Add this to your PowerShell profile:
 
 ```powershell
 function Score-Notion {
-    cd "$HOME\Documents\Claude Apps\investor-database-agent"
+    cd $HOME\Documents\Claude-Apps\investor-database-agent
     npm run score-notion
 }
 ```
@@ -191,19 +191,13 @@ Then you can just type `Score-Notion` from anywhere!
 
 ### Error: "Cannot find path"
 
-**Your path has a space** ("Claude Apps"), so make sure to use quotes:
+**Solution:** Make sure you're using the correct path with the hyphen:
 
 ```powershell
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 ```
 
-Or escape the space:
-
-```powershell
-cd $HOME\Documents\Claude` Apps\investor-database-agent
-```
-
-**Recommended:** Use quotes (easier and more reliable)
+**Note:** The folder is "Claude-Apps" (with hyphen), not "Claude Apps" (with space)
 
 ### Error: "npm is not recognized"
 
@@ -231,10 +225,10 @@ cd $HOME\Documents\Claude` Apps\investor-database-agent
 # Check where you are
 pwd
 
-# Should show: C:\Users\Sean Weiss\Documents\Claude Apps\investor-database-agent
+# Should show: C:\Users\Sean Weiss\Documents\Claude-Apps\investor-database-agent
 
 # If not, navigate there
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 
 # Then try again
 npm run score-notion
@@ -246,7 +240,7 @@ npm run score-notion
 
 ```powershell
 # Navigate to project
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 
 # Create .env file
 New-Item -Path .env -ItemType File -Force
@@ -295,7 +289,7 @@ RESEARCH_TIMEOUT_MS=300000
 
 ```powershell
 # Every Monday morning
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 npm run score-notion
 ```
 
@@ -305,7 +299,7 @@ npm run score-notion
 
 ```powershell
 # Just added 20 new investors to Notion? Score them!
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 npm run score-notion
 ```
 
@@ -313,7 +307,7 @@ npm run score-notion
 
 ```powershell
 # About to start investor outreach? Get fresh scores!
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 npm run score-notion
 ```
 
@@ -348,7 +342,7 @@ Click on any investor to see the detailed breakdown of why they match
 ### 1. Run the Script Now
 
 ```powershell
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 npm run score-notion
 ```
 
@@ -373,7 +367,7 @@ Use the scored list for your January 1 fundraising campaign!
 
 | Task | Command |
 |------|---------|
-| Navigate to project | `cd "$HOME\Documents\Claude Apps\investor-database-agent"` |
+| Navigate to project | `cd $HOME\Documents\Claude-Apps\investor-database-agent` |
 | Score Notion investors | `npm run score-notion` |
 | Pull latest updates | `git pull origin claude/vc-lead-research-agent-QSDuJ` |
 | Install dependencies | `npm install` |
@@ -389,7 +383,7 @@ Type the first few letters, then press Tab:
 
 ```powershell
 cd $HOME\Doc[TAB]\Clau[TAB]\inv[TAB]
-# Becomes: cd "$HOME\Documents\Claude Apps\investor-database-agent"
+# Becomes: cd $HOME\Documents\Claude-Apps\investor-database-agent
 ```
 
 ### 2. Create an Alias
@@ -411,12 +405,12 @@ Use Windows Task Scheduler to run it automatically every Monday at 9 AM
 
 Your Notion scoring script is ready to go at:
 ```
-C:\Users\Sean Weiss\Documents\Claude Apps\investor-database-agent
+C:\Users\Sean Weiss\Documents\Claude-Apps\investor-database-agent
 ```
 
 Just run:
 ```powershell
-cd "$HOME\Documents\Claude Apps\investor-database-agent"
+cd $HOME\Documents\Claude-Apps\investor-database-agent
 npm run score-notion
 ```
 
