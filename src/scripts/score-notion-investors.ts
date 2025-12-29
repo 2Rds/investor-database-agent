@@ -144,10 +144,10 @@ class NotionScorer {
           '# Match': {
             number: score.percentageMatch,
           },
-          'Match Tier': {
+          'Tier': {
             select: { name: score.tier },
           },
-          'Match Details': {
+          'Match Detail': {
             rich_text: [{ text: { content: matchDetails.substring(0, 2000) } }],
           },
           'Enriched': {

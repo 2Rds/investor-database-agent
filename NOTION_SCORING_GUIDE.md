@@ -10,8 +10,8 @@ This script connects to your Notion VC lead database and applies the BlockDrive-
 2. **Scores** each investor using the BlockDrive algorithm (100-point system)
 3. **Updates** Notion with:
    - # Match (0-100 score)
-   - Match Tier (S-Tier, A-Tier, B-Tier, C-Tier, Not a Match)
-   - Match Details (detailed breakdown of scoring)
+   - Tier (S-Tier, A-Tier, B-Tier, C-Tier, Not a Match)
+   - Match Detail (detailed breakdown of scoring)
    - Enriched checkbox (marked as true)
 
 ## 📋 Prerequisites
@@ -31,30 +31,12 @@ Your Notion database needs these properties:
 - ✅ **# Match** (Number) - Match score percentage
 - ✅ **Enriched** (Checkbox) - Whether data is enriched
 
-#### New Properties to Add:
-You may need to add these to your Notion database:
+#### Required Properties (User Added):
+- ✅ **Tier** (Select) - Match tier classification
+  - Options: S-Tier, A-Tier, B-Tier, C-Tier, Not a Match
+- ✅ **Match Detail** (Rich Text) - Detailed scoring breakdown
 
-**Match Tier** (Select)
-- Type: Select
-- Options:
-  - S-Tier (color: green)
-  - A-Tier (color: blue)
-  - B-Tier (color: yellow)
-  - C-Tier (color: orange)
-  - Not a Match (color: red)
-
-**Match Details** (Rich Text)
-- Type: Rich Text
-- Description: Detailed scoring breakdown
-
-### 2. Add Properties to Notion
-
-1. Open your Notion Fundraising Tracker database
-2. Click the **+** button to add a new property
-3. Create **Match Tier** as a Select field with the options above
-4. Create **Match Details** as a Rich Text field
-
-### 3. Environment Variables
+### 2. Environment Variables
 
 Ensure these are set in your `.env` file:
 
@@ -134,7 +116,7 @@ Failed: 0
 ...
 
 🎉 All match scores have been updated in your Notion database!
-📌 Check the "# Match", "Match Tier", and "Match Details" columns
+📌 Check the "# Match", "Tier", and "Match Detail" columns
 ```
 
 ## 📊 Match Scoring Algorithm
@@ -181,9 +163,9 @@ Failed: 0
 
 **# Match:** 100
 
-**Match Tier:** S-Tier
+**Tier:** S-Tier
 
-**Match Details:**
+**Match Detail:**
 ```
 Perfect fit for BlockDrive: blockchain infrastructure with strong privacy/security focus
 
@@ -201,14 +183,14 @@ Breakdown:
 ## 🎯 Next Steps After Scoring
 
 1. **Filter by S-Tier**
-   - In Notion, filter by `Match Tier = S-Tier`
+   - In Notion, filter by `Tier = S-Tier`
    - These are your top priority targets (90-100% match)
 
 2. **Sort by # Match**
    - Sort descending to see best matches first
    - Focus on 75+ for initial outreach
 
-3. **Review Match Details**
+3. **Review Match Detail**
    - Read the detailed breakdown for each top match
    - Understand WHY they're a good fit for personalized outreach
 
@@ -255,9 +237,9 @@ The script maps Notion properties to the scoring format:
 - Verify Notion integration has access to database
 - Ensure API key is valid
 
-### Error: "Property 'Match Tier' does not exist"
-- Add the "Match Tier" select property to your Notion database
-- See "Add Properties to Notion" section above
+### Error: "Property 'Tier' does not exist"
+- Add the "Tier" select property to your Notion database
+- Ensure it has options: S-Tier, A-Tier, B-Tier, C-Tier, Not a Match
 
 ### Error: "Rate limit exceeded"
 - Script already includes rate limiting
