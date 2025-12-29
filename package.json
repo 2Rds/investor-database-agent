@@ -11,7 +11,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest",
     "analyze-csv": "tsx src/scripts/analyze-csv.ts",
-    "enrich-top-matches": "tsx src/scripts/enrich-top-matches.ts"
+    "enrich-top-matches": "tsx src/scripts/enrich-top-matches.ts",
+    "score-notion": "tsx src/scripts/score-notion-investors.ts"
   },
   "keywords": [
     "slack",
